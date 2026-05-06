@@ -3,6 +3,7 @@ import "./App.css";
 
 function App() {
   let [selectedTaskId, setSelectedTaskId] = useState(null);
+  let [selectedTask, setSelectedTask] = useState(null);
   let [tasks, setTasks] = useState(null);
 
   useEffect(() => {
@@ -25,10 +26,6 @@ function App() {
     "#ff9248",
     "#ff6700",
   ];
-
-  // const tasks = null;
-
-  // const tasks = [];
 
   if (tasks === null) {
     return (
@@ -54,69 +51,111 @@ function App() {
         className="resetTaskBorder"
         onClick={() => {
           setSelectedTaskId(null);
+          setSelectedTask(null);
         }}
       >
         Сбсросить выделение
       </button>
-      <ul>
-        {tasks.map(
-          (
-            task,
-            // : {
-            // id: number;
-            // title: string;
-            // isDone: boolean;
-            // addedAt: string;
-            // priority: number;
-            // }
-          ) => (
-            <li
-              key={task.id}
-              style={{
-                background: priorityColors[task.attributes.priority] ?? "black",
-                border:
-                  task.id === selectedTaskId
-                    ? "2px solid blue"
-                    : "1px solid white",
-                marginBottom: "10px",
-                padding: "8px",
-                color: "black",
-              }}
-            >
-              <div
-                onClick={() => {
-                  setSelectedTaskId(task.id);
+      <div className="flexContainer">
+        <ul>
+          {tasks.map(
+            (
+              task,
+              // : {
+              // id: number;
+              // title: string;
+              // isDone: boolean;
+              // addedAt: string;
+              // priority: number;
+              // }
+            ) => (
+              <li
+                key={task.id}
+                style={{
+                  background:
+                    priorityColors[task.attributes.priority] ?? "black",
+                  border:
+                    task.id === selectedTaskId
+                      ? "2px solid blue"
+                      : "2px solid transparent",
+                  marginBottom: "10px",
+                  padding: "8px",
+                  color: "black",
                 }}
               >
-                {" "}
-                <div>
-                  <strong>Задача:</strong>{" "}
-                  <span
-                    style={{
-                      textDecoration:
-                        task.attributes.status === 2 ? "line-through" : "none",
-                    }}
-                  >
-                    {task.attributes.title}
-                  </span>
+                <div
+                  onClick={() => {
+                    setSelectedTaskId(task.id);
+                    setSelectedTask(null);
+
+                    fetch(
+                      "https://trelly.it-incubator.app/api/1.0/boards/" +
+                        task.attributes.boardId +
+                        "/tasks/" +
+                        task.id,
+                      {
+                        headers: {
+                          "api-key": "599e0fa5-4b4a-412d-b9fd-e509a0a227c4",
+                        },
+                      },
+                    )
+                      .then((res) => res.json())
+                      .then((json) => {
+                        setSelectedTask(json.data);
+                      });
+                  }}
+                >
+                  {" "}
+                  <div>
+                    <strong>Задача:</strong>{" "}
+                    <span
+                      style={{
+                        textDecoration:
+                          task.attributes.status === 2
+                            ? "line-through"
+                            : "none",
+                      }}
+                    >
+                      {task.attributes.title}
+                    </span>
+                  </div>
+                  <div>
+                    <strong>Статус:</strong>{" "}
+                    <input
+                      type="checkbox"
+                      checked={task.attributes.status === 2}
+                      readOnly
+                    />
+                  </div>
+                  <div>
+                    <strong>Дата создания задачи:</strong>{" "}
+                    {new Date(task.attributes.addedAt).toLocaleDateString()}
+                  </div>
                 </div>
-                <div>
-                  <strong>Статус:</strong>{" "}
-                  <input
-                    type="checkbox"
-                    checked={task.attributes.status === 2}
-                    readOnly
-                  />
-                </div>
-                <div>
-                  <strong>Дата создания задачи:</strong>{" "}
-                  {new Date(task.attributes.addedAt).toLocaleDateString()}
-                </div>
-              </div>
-            </li>
-          ),
-        )}
-      </ul>
+              </li>
+            ),
+          )}
+        </ul>
+        <div className="taskDetails">
+          <h2>Task details</h2>
+          {selectedTaskId === null ? (
+            <p>Task is not selected</p>
+          ) : selectedTask === null ? (
+            <p>...Loading</p>
+          ) : (
+            <ul className="taskDetailsList">
+              <li>Title: {selectedTask.attributes.title}</li>
+
+              <li>Board title: {selectedTask.attributes.boardTitle}</li>
+
+              <li>
+                Description:{" "}
+                {selectedTask.attributes.description ?? "no description"}
+              </li>
+            </ul>
+          )}
+        </div>
+      </div>
     </>
   );
 }

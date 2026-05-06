@@ -5,6 +5,11 @@
   text-align: center;
 }
 
+.flexContainer {
+  display: flex;
+  gap: 35px;
+}
+
 .toDoList {
   font-size: 30px;
   font-weight: 600;
@@ -20,4 +25,18 @@
 
 .resetTaskBorder {
   margin-left: 25px;
+}
+
+.taskDetails {
+  width: 300px;
+  text-align: left;
+}
+
+.taskDetailsList {
+  padding-left: 20px;
+  margin: 0;
+}
+
+.taskDetailsList li {
+  margin-bottom: 8px;
 }
