@@ -138,11 +138,12 @@ function App() {
         </ul>
         <div className="taskDetails">
           <h2>Task details</h2>
-          {selectedTaskId === null ? (
-            <p>Task is not selected</p>
-          ) : selectedTask === null ? (
-            <p>...Loading</p>
-          ) : (
+          {!selectedTaskId && <p>Task is not selected</p>}
+          {selectedTaskId &&
+            (!selectedTask || selectedTaskId !== selectedTask.id) && (
+              <p>...Loading</p>
+            )}
+          {selectedTask && selectedTaskId === selectedTask.id && (
             <ul className="taskDetailsList">
               <li>Title: {selectedTask.attributes.title}</li>
 
