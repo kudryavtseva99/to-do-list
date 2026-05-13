@@ -5,6 +5,7 @@ function App() {
   let [selectedTaskId, setSelectedTaskId] = useState(null);
   let [selectedTask, setSelectedTask] = useState(null);
   let [tasks, setTasks] = useState(null);
+  let [boardId, setBoardId] = useState(null);
 
   useEffect(() => {
     console.log("effect");
@@ -18,6 +19,31 @@ function App() {
         setTasks(json.data);
       });
   }, []);
+
+  useEffect(() => {
+    if (!selectedTaskId || !boardId) {
+      setSelectedTask(null);
+      return;
+    }
+
+    setSelectedTask(null);
+
+    fetch(
+      "https://trelly.it-incubator.app/api/1.0/boards/" +
+        boardId +
+        "/tasks/" +
+        selectedTaskId,
+      {
+        headers: {
+          "api-key": "599e0fa5-4b4a-412d-b9fd-e509a0a227c4",
+        },
+      },
+    )
+      .then((res) => res.json())
+      .then((json) => {
+        setSelectedTask(json.data);
+      });
+  }, [selectedTaskId, boardId]);
 
   const priorityColors = [
     "#ffffff",
@@ -52,6 +78,7 @@ function App() {
         onClick={() => {
           setSelectedTaskId(null);
           setSelectedTask(null);
+          setBoardId(null);
         }}
       >
         Сбсросить выделение
@@ -86,23 +113,7 @@ function App() {
                 <div
                   onClick={() => {
                     setSelectedTaskId(task.id);
-                    setSelectedTask(null);
-
-                    fetch(
-                      "https://trelly.it-incubator.app/api/1.0/boards/" +
-                        task.attributes.boardId +
-                        "/tasks/" +
-                        task.id,
-                      {
-                        headers: {
-                          "api-key": "599e0fa5-4b4a-412d-b9fd-e509a0a227c4",
-                        },
-                      },
-                    )
-                      .then((res) => res.json())
-                      .then((json) => {
-                        setSelectedTask(json.data);
-                      });
+                    setBoardId(task.attributes.boardId);
                   }}
                 >
                   {" "}
